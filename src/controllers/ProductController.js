@@ -3,18 +3,18 @@ const Database = require("../database/Database");
 class ProductController extends Database {
   async createProduct(req, res) {
     try {
-      const { name, amount, color, voltage, description, category_id } =
+      const { name, amount, color, voltage, description, category_id, price } =
         req.body;
 
-      if (!name || amount === undefined || !category_id) {
+      if (!name || amount === undefined || !category_id || !price) {
         return res
           .status(400)
-          .json({ error: "Name, amount, and category_id are required" });
+          .json({ error: "Name, price, amount, and category_id are required" });
       }
 
       const query = `
-        INSERT INTO products (name, amount, color, voltage, description, category_id) 
-        VALUES ($1, $2, $3, $4, $5, $6) 
+        INSERT INTO products (name, amount, color, voltage, description, category_id, price) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7) 
         RETURNING *`;
       const product = await this.database.query(query, [
         name,
@@ -22,7 +22,8 @@ class ProductController extends Database {
         color,
         voltage,
         description,
-        category_id
+        category_id,
+        price
       ]);
       return res.status(201).json({
         message: "Product created successfully",
@@ -48,7 +49,7 @@ class ProductController extends Database {
       const { id } = req.params;
 
       const query = `SELECT 
-          p.id, p.name, p.amount, p.color, p.voltage, p.description, 
+          p.id, p.name, p.amount, p.color, p.voltage, p.description, p.price,
           c.id as category_id, c.name as category_name 
         FROM products p
         JOIN categories c ON p.category_id = c.id
@@ -68,7 +69,7 @@ class ProductController extends Database {
   async updateProduct(req, res) {
     try {
       const { id } = req.params;
-      const { name, amount, color, voltage, description, category_id } =
+      const { name, price, amount, color, voltage, description, category_id } =
         req.body;
 
       const productExists = await this.database.query(
@@ -82,13 +83,14 @@ class ProductController extends Database {
 
       const query = `
         UPDATE products SET 
-        name = $1, 
+        name = $1,
         amount = $2, 
         color = $3, 
         voltage = $4, 
         description = $5, 
-        category_id = $6 
-        WHERE id = $7 
+        category_id = $6,
+        price = $7,
+        WHERE id = $8 
         RETURNING *`;
       const productUpdated = await this.database.query(query, [
         name || productExists.rows[0].name,
@@ -97,6 +99,7 @@ class ProductController extends Database {
         voltage || productExists.rows[0].voltage,
         description || productExists.rows[0].description,
         category_id || productExists.rows[0].category_id,
+        price || productExists.rows[0].price,
         id
       ]);
 
