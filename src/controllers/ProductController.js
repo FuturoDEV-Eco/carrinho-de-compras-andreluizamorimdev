@@ -33,6 +33,16 @@ class ProductController extends Database {
     }
   }
 
+  async listProducts(req, res) {
+    try {
+      const query = `SELECT * FROM products`;
+      const products = await this.database.query(query);
+      return res.json(products.rows);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  }
+
   async updateProduct(req, res) {
     try {
       const { id } = req.params;
