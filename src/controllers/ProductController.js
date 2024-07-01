@@ -43,6 +43,28 @@ class ProductController extends Database {
     }
   }
 
+  async getProductWithDetails(req, res) {
+    try {
+      const { id } = req.params;
+
+      const query = `SELECT 
+          p.id, p.name, p.amount, p.color, p.voltage, p.description, 
+          c.id as category_id, c.name as category_name 
+        FROM products p
+        JOIN categories c ON p.category_id = c.id
+        WHERE p.id = $1`;
+      const product = await this.database.query(query, [id]);
+
+      if (product.rows.length === 0) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      return res.json(product.rows[0]);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  }
+
   async updateProduct(req, res) {
     try {
       const { id } = req.params;
