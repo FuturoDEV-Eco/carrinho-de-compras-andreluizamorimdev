@@ -8,6 +8,7 @@ productsRoutes.post(
   "/",
   ProductController.createProduct.bind(ProductController)
 );
+productsRoutes.get("/", ProductController.listProducts.bind(ProductController));
 productsRoutes.put(
   "/:id",
   ProductController.updateProduct.bind(ProductController)
