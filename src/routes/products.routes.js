@@ -9,6 +9,10 @@ productsRoutes.post(
   ProductController.createProduct.bind(ProductController)
 );
 productsRoutes.get("/", ProductController.listProducts.bind(ProductController));
+productsRoutes.get(
+  "/:id",
+  ProductController.getProductWithDetails.bind(ProductController)
+);
 productsRoutes.put(
   "/:id",
   ProductController.updateProduct.bind(ProductController)
